@@ -1,0 +1,200 @@
+package Shopping;
+
+import java.util.*;
+
+/**
+ * This is the file where you will do most of your work. You are responsible for
+ * implementing remove(), find(), and contains(). Feel free to use the Array
+ * based implementation as a base to figure out what you need to do
+ * 
+ * @version Spring 2022
+ * @author ITCS 2214
+ */
+public class ShoppingListArrayList implements ShoppingListADT {
+
+    private ArrayList<Grocery> shoppingList;
+
+    /**
+     * Default constructor for creating an empty shopping list
+     */
+    public ShoppingListArrayList() {
+        this.shoppingList = new ArrayList<>();
+    }
+
+    /**
+     * Method to add a new entry to the shopping list. If a matching item already
+     * exists, the quantities are combined
+     * 
+     * @param entry the new item to add
+     */
+    @Override
+    public void add(Grocery entry) {
+        if (entry == null) {
+            return;
+        }
+
+        // Check if this item already exists
+        if (this.contains(entry)) {
+            // Merge the quantity of new entry into existing entry
+            this.combineQuantity(entry);
+            return;
+        }
+
+        this.shoppingList.add(entry);
+    }
+
+    /**
+     * Method to remove a specific entry from the shopping list
+     * 
+     * @param entry the item to remove
+     * @return true if the operation was completed successfully
+     */
+    @Override
+    public boolean remove(Grocery entry) {
+
+        // the boolean found describes whether or not we find the
+        // entry to remove
+        boolean found = false;
+
+        try {
+           int number = this.indexOf(entry);//find index of the item passed
+           shoppingList.remove(number);//removes the element
+           found = true;// found is set to true
+       } catch (ElementNotFoundException e) {
+           System.out.println("Unable to remove as the element is not found!");
+       }
+
+       // Return false if not found
+       return found;
+    }
+
+    /**
+     * Method to find a specific item in the shopping list
+     * 
+     * @param index the index of the item in the shopping list
+     * @return the entry at the specified index
+     * @throws IndexOutOfBoundsException if the index is out of bounds
+     * @throws EmptyCollectionException  if the shopping list is empty
+     */
+    @Override
+    public Grocery find(int number) throws IndexOutOfBoundsException, EmptyCollectionException {
+       if (this.isEmpty()) {
+           throw new EmptyCollectionException("ECE - find");
+       }
+
+       // check if the input number is legal
+       // for example, < 0 or falls outside of the number size
+       if (number < 0 || number > this.size()) {
+           throw new IndexOutOfBoundsException("IOOBE - find");
+       }
+
+       // return the corresponding number entry in the shoppingList
+       // need to change the return value
+       return shoppingList.get(number);
+    }
+
+    /**
+     * Method to find the index of a Grocery item that is equivalent to the one
+     * provided
+     * 
+     * @param entry the item to find
+     * @return the index of the specified item in the shopping list
+     * @throws ElementNotFoundException if the specified item is not in the shopping
+     *                                  list
+     */
+    @Override
+    public int indexOf(Grocery entry) throws ElementNotFoundException {
+        if (entry != null) {
+            for (int i = 0; i < shoppingList.size(); i++) {
+                if (shoppingList.get(i).compareTo(entry) == 0) {
+                    return i;
+                }
+            }
+        }
+        throw new ElementNotFoundException("indexOf");
+    }
+
+    /**
+     * Method to determine the existence of a specific item in the shopping list
+     * 
+     * @param entry the item to find
+     * @return true if the specified item exists in the shopping list, otherwise
+     *         false
+     */
+    @Override
+    public boolean contains(Grocery entry) {
+        boolean hasItem = false;
+
+          for (Grocery item : shoppingList) {
+           if (item.compareTo(entry) == 0)
+               hasItem = true;
+       }
+        return hasItem;
+    }
+
+    /**
+     * Method to get the size of the shopping list
+     * 
+     * @return the size of the shopping list
+     */
+    @Override
+    public int size() {
+        return shoppingList.size();
+    }
+
+    /**
+     * Method to tell if the shopping list is empty
+     * 
+     * @return true if the shopping list is empty, otherwise false
+     */
+    @Override
+    public boolean isEmpty() {
+        return shoppingList.isEmpty();
+    }
+
+    /**
+     * Method to return a string representation of the shopping list
+     * 
+     * @return the string representation of the shopping list
+     */
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append(String.format("%-25s", "NAME"));
+        s.append(String.format("%-18s", "CATEGORY"));
+        s.append(String.format("%-10s", "AISLE"));
+        s.append(String.format("%-10s", "QUANTITY"));
+        s.append(String.format("%-10s", "PRICE"));
+        s.append('\n');
+        s.append("------------------------------------------------------------" + "-------------");
+        s.append('\n');
+        for (int i = 0; i < shoppingList.size(); i++) {
+            s.append(String.format("%-25s", this.shoppingList.get(i).getName()));
+            s.append(String.format("%-18s", this.shoppingList.get(i).getCategory()));
+            s.append(String.format("%-10s", this.shoppingList.get(i).getAisle()));
+            s.append(String.format("%-10s", this.shoppingList.get(i).getQuantity()));
+            s.append(String.format("%-10s", this.shoppingList.get(i).getPrice()));
+            s.append('\n');
+            s.append("--------------------------------------------------------" + "-----------------");
+            s.append('\n');
+        }
+
+        return s.toString();
+    }
+
+    /**
+     * Method to add the quantity of duplicate entries in the shopping list
+     * 
+     * @param entry duplicate entry
+     */
+    private void combineQuantity(Grocery entry) {
+        try {
+            int index = this.indexOf(entry);
+            this.shoppingList.get(index).setQuantity(this.shoppingList.get(index).getQuantity() + entry.getQuantity());
+        } catch (ElementNotFoundException e) {
+            System.out.println("combineQuantity - ECE");
+        }
+
+    }
+
+}
